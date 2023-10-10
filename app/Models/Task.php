@@ -9,11 +9,6 @@ class Task extends Model
 {
     use HasFactory;
 
-    public function user()
-    {
-        return $this->belongsToMany(User::class, 'task_user', 'task_id', 'user_id');
-    }
-
     protected $fillable =
     [
         'title',
@@ -25,4 +20,9 @@ class Task extends Model
         'actual_progress',
 
     ];
+
+    public function user()
+    {
+        return $this->belongsToMany(User::class, 'task_user', 'task_id', 'user_id');
+    }
 }

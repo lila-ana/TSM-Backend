@@ -20,7 +20,7 @@ class TaskController extends Controller
 
     public function index()
     {
-        $tasks = Task::all();
+        $tasks = Task::with('user')->get();
         return response()->json(['tasks' => $tasks]);
     }
 
@@ -28,8 +28,8 @@ class TaskController extends Controller
 
     public function show($id)
     {
-        $task = Task::findOrFail($id);
-        return response()->json($task);
+        $task = Task::where('id', $id)->with('user')->first();
+        return response()->json(['tasks' => $task]);
     }
 
     public function store(Request $request)
@@ -40,25 +40,26 @@ class TaskController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'actual_progress' => 'required|int',
-            'assigned_to' => 'required|exists:users,id',
+            'assigned_to' => 'required|array',
             // 'status' => 'string',
         ]);
-        $id = $request->input('assigned_to');
-
-        $user = User::where('id', $id)->first();
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-        $userContent = [
-            'name' => $user->name,
-            'email' => $user->email
-        ];
-        $userContentJson = json_encode($userContent);
-
-        $validatedData['assigned_to'] = $userContentJson;
+        unset($validatedData['assigned_to']);
         // return $validatedData;
+        $userIds = $request->input('assigned_to');
+        foreach ($userIds as $key => $id) {
+            // return $id;
+
+            # code...
+            $user = User::where('id', $id)->first();
+            if (!$user) {
+                return response()->json(['error' => 'User with id = '  . $id .  'not found'], 404);
+            }
+        }
+
 
         $task = Task::create($validatedData);
+
+        $task->user()->attach($userIds);
 
         return response()->json(['message' => 'Task created successfully', 'task' => $task], 201);
     }
