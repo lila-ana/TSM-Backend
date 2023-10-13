@@ -5,13 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException as ValidationValidationException;
 use Dirape\Token\Token;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
-use App\Notifications\TaskCreatedNotification;
-use App\Notifications\UserCreatedNotification;
+
 
 // use Ramsey\Uuid\Uuid;
 
@@ -29,7 +26,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            return response()->json(['message' => 'Login successful', 'user' => $user]);
+            return response()->json(['message' => 'Login successful', 'data' => $user]);
         }
 
         return response()->json(['message' => 'Invalid credentials'], 401);

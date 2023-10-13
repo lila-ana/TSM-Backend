@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->uuid('assigned_to'); // Reference the UUID of the user
-            $table->string('actual_progress');
+            $table->string('planned_progress');
             $table->timestamps();
             // $table->foreign('assigned_to')->references('id')->on('users')->onDelete('cascade');
         });

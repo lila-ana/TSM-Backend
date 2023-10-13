@@ -28,6 +28,11 @@ class TaskController extends Controller
 
     public function show($id)
     {
+        $task = Task::where('user_id', $id)->with('user')->get();
+        return response()->json(['tasks' => $task]);
+    }
+    public function showTask($id)
+    {
         $task = Task::where('id', $id)->with('user')->first();
         return response()->json(['tasks' => $task]);
     }
@@ -39,10 +44,12 @@ class TaskController extends Controller
             'description' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'actual_progress' => 'required|int',
+            'planned_progress' => 'required|int',
             'assigned_to' => 'required|array',
+
             // 'status' => 'string',
         ]);
+
         unset($validatedData['assigned_to']);
         // return $validatedData;
         $userIds = $request->input('assigned_to');
@@ -78,7 +85,7 @@ class TaskController extends Controller
             'description' => 'string',
             'start_date' => 'date',
             'end_date' => 'date',
-            'actual_progress' => 'int',
+            'planned_progress' => 'int',
             'assigned_to' => 'string|exists:users,id',
 
         ]);
@@ -103,8 +110,8 @@ class TaskController extends Controller
             $task->end_date = $validatedData['end_date'];
             $changes = true;
         }
-        if (isset($validatedData['actual_progress']) && $validatedData['actual_progress'] !== $task->progress) {
-            $task->actual_progress = $validatedData['actual_progress'];
+        if (isset($validatedData['planned_progress']) && $validatedData['planned_progress'] !== $task->progress) {
+            $task->planned_progress = $validatedData['planned_progress'];
             $changes = true;
         }
         if (isset($validatedData['assigned_to']) && $validatedData['progress'] !== $task->progress) {
@@ -157,7 +164,7 @@ class TaskController extends Controller
         $task = Task::find($taskId);
 
         $validator = Validator::make($request->all(), [
-            'actual_progress' => 'integer|between:0,100',
+            'planned_progress' => 'integer|between:0,100',
         ]);
 
         if ($validator->fails()) {
@@ -166,7 +173,7 @@ class TaskController extends Controller
 
         $start_date = $task->start_date;
         $end_date = $task->end_date;
-        $actualProgress = $task->actual_progress;
+        $plannedProgress = $task->planned_progress;
         $current_date = Carbon::now();
 
         // Convert the date strings to DateTime objects
@@ -179,15 +186,15 @@ class TaskController extends Controller
         $progressPercentage = round(($elapsed_duration / $total_duration) * 100, 2);
 
 
-        $plannedProgress = number_format($progressPercentage, 2);
+        $actualProgress = number_format($progressPercentage, 2);
 
-        $deviation = number_format(($actualProgress - $plannedProgress), 2);
+        $deviation = number_format(($plannedProgress - $actualProgress), 2);
 
 
         return response()->json([
             'message' => 'Progress comparison result',
-            'planned_progress' => $plannedProgress,
             'actual_progress' => $actualProgress,
+            'planned_progress' => $plannedProgress,
             'deviation' => $deviation,
             'progress_percentage' => $progressPercentage . '%', // Include progressPercentage here
 

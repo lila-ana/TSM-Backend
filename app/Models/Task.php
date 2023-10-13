@@ -17,7 +17,7 @@ class Task extends Model
         'end_date',
         'assigned_to',
         // 'status',
-        'actual_progress',
+        'planned_progress',
 
     ];
 

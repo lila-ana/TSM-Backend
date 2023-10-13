@@ -49,12 +49,13 @@ Route::post('register', [AuthController::class, 'register']);
 
 
 //Tasks
-Route::apiResource('tasks', TaskController::class);
+Route::post('tasks', [TaskController::class, 'store']);
 Route::get('tasks/{tasksID}', [TaskController::class, 'index']);
 Route::get('tasks/{id}', [TaskController::class, 'show']);
+Route::get('taskdetails/{id}', [TaskController::class, 'showTask']);
 Route::patch('tasks/{id}', [TaskController::class, 'update']);
 Route::get('tasks/{task}/assigned-date', [TaskController::class, 'calculateAssignedDate']);
-Route::post('tasks/{taskID}/compare-progress', [TaskController::class, 'CompareProgress']);
+Route::get('tasks/{taskID}/compare-progress', [TaskController::class, 'CompareProgress']);
 
 //progress 
 Route::post('/tasks/{taskID}/calculate-progress', [ProgressController::class, 'calculateProgress']);
